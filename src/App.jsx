@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"; // 1. Import Navigate
 
 import Layout from "./components/Layout";
 import { Navbar } from "./components/Navbar";
@@ -18,13 +18,16 @@ export default function App() {
         <SEO
           title="Blessing Attorney Blog"
           description="Legal commentary and resources by Blessing Attorney."
-          url="https://blessingattorney.com"
+          url="https://bt-demo-blog.vercel.app"
         />
         <Navbar />
         <Routes>
           <Route path="/" element={<BlessingAttorneyBlog />} />
           <Route path="/create-blog-post" element={<CreateArticle />} />
           <Route path="/blog/:slug" element={<BlogDetails />} />
+
+          {/* 2. Catch-all route for any undefined path */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Footer />
       </Layout>

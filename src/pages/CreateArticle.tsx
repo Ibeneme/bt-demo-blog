@@ -71,7 +71,7 @@ export default function CreateArticle() {
         "@type": "NewsArticle",
         headline: title || "Untitled Article",
         description: excerpt || "No description provided.",
-        url: `https://yourdomain.com/insights/${fallbackSlug}`,
+        url: `https://bt-demo-blog.vercel.app/blog/${fallbackSlug}`,
       },
       null,
       2
@@ -159,11 +159,25 @@ export default function CreateArticle() {
     setLoading(true);
     setApiError(null);
 
-    let publicImageUrl = "";
-    let ogImageUrl = "";
-
     try {
-      // 1. Upload Images
+      // 1. Check for duplicate slug before inserting
+      let finalSlug = formData.slug;
+      const { data: existingArticles, error: checkError } = await supabase
+        .from("articles")
+        .select("slug")
+        .eq("slug", finalSlug);
+
+      if (checkError) throw checkError;
+
+      // If duplicate found, append a 4-character random string
+      if (existingArticles && existingArticles.length > 0) {
+        const randomId = Math.random().toString(36).substring(2, 6);
+        finalSlug = `${finalSlug}-${randomId}`;
+      }
+
+      // 2. Upload Images (using finalSlug-based naming if desired)
+      let publicImageUrl = "";
+      let ogImageUrl = "";
       if (selectedFile) {
         publicImageUrl = await uploadImageFile(selectedFile, "blog-covers");
       }
@@ -176,7 +190,7 @@ export default function CreateArticle() {
         category: formData.category,
         excerpt: formData.excerpt,
         content: formData.content,
-        slug: formData.slug,
+        slug: finalSlug, // Use the unique slug
         image_url: publicImageUrl || null,
         meta_title: formData.metaTitle || null,
         meta_description: formData.metaDescription || null,
@@ -189,12 +203,11 @@ export default function CreateArticle() {
 
       // 3. Insert Data
       const { error } = await supabase.from("articles").insert([articleData]);
-      // .select();
-
       if (error) throw error;
 
       setModalType("success");
       setShowModal(true);
+      // Reset form logic here...
     } catch (error: any) {
       console.error("Full Error Object:", error);
       setApiError(error.message || "Failed to save data.");

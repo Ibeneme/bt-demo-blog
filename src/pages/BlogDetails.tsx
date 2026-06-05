@@ -11,6 +11,7 @@ import {
 import { motion } from "framer-motion";
 import { supabase } from "../configs/supabase";
 import SEO from "../components/SEO"; // Adjust file location path according to your workspace
+import { Helmet } from "react-helmet-async";
 
 interface BlogPost {
   id: number | string;
@@ -201,6 +202,25 @@ export default function BlogDetails() {
     <div className="bg-[#F8F7F4] min-h-screen font-['Rethink_Sans']">
       {/* Dynamic Page Header Data Injections */}
       <SEO title={post.title} description={post.excerpt} image={post.image} />
+
+      <Helmet>
+        <title>{post.title} | Blessing Attorney</title>
+        <meta name="description" content={post.excerpt} />
+        <link
+          rel="canonical"
+          href={`https://bt-demo-blog.vercel.app/blog/${post.slug}`}
+        />
+
+        {/* Open Graph Tags for Social Media */}
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:type" content="article" />
+        <meta
+          property="og:url"
+          content={`https://bt-demo-blog.vercel.app/blog/${post.slug}`}
+        />
+        <meta property="og:image" content={post.image} />
+      </Helmet>
 
       {/* ✅ GLOBAL STYLES FOR BLOG CONTENT */}
       <style>{`
